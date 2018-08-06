@@ -39,9 +39,9 @@
 #[macro_use]
 extern crate lazy_static;
 
-pub mod config_parser;
-pub mod letters;
-pub mod ligatures;
+mod config_parser;
+mod letters;
+mod ligatures;
 
 mod algorithm;
 use algorithm::ArabicReshaper;
