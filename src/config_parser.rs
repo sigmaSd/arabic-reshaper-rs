@@ -1,10 +1,8 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
 
 pub fn parse() -> HashMap<String, bool> {
     let mut config_map = HashMap::new();
-    let mut config_file = include_str!("default-config.ini");
+    let config_file = include_str!("default-config.ini");
 
     for line in config_file.lines() {
         if !line.contains('=') || line.starts_with('#') {
