@@ -71,24 +71,3 @@ pub fn arabic_reshape_l(text: &str) -> String {
 
     result
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn multi_line() {
-        let salam = arabic_reshape_r(
-            "السلام
-                            عليكم",
-        );
-
-        println!("{}", salam);
-        let salam = arabic_reshape_l(
-            "السلام
-                            عليكم",
-        );
-
-        println!("{}", salam);
-    }
-
-}
