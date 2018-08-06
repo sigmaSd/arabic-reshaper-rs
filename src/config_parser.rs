@@ -4,14 +4,9 @@ use std::io::Read;
 
 pub fn parse() -> HashMap<String, bool> {
     let mut config_map = HashMap::new();
-    let mut config_file = File::open("default-config.ini").expect("default-config.ini not found");
-    let mut config = String::new();
+    let mut config_file = include_str!("default-config.ini");
 
-    config_file
-        .read_to_string(&mut config)
-        .expect("error while reading default-config.ini");
-
-    for line in config.lines() {
+    for line in config_file.lines() {
         if !line.contains('=') || line.starts_with('#') {
             continue;
         }
