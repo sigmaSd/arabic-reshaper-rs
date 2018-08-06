@@ -2,7 +2,7 @@
 
 Reconstruct Arabic sentences to be used in applications that don't support Arabic.
 
-This crate is [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper)ported to rust. 
+This crate is [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) ported to rust. 
 
 ## Usage:
 
