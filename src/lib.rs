@@ -2,7 +2,7 @@
 
 //! # arabic_reshaper
 //!
-//! Reconstruct Arabic sentences to be used in applications that doesn't support Arabic script.
+//! Reconstruct Arabic sentences to be used in applications that don't support Arabic script.
 //!
 //! This crate exposes 2 functions:
 //!

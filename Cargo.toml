@@ -1,11 +1,15 @@
 [package]
 name = "arabic_reshaper"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 readme = "README.md"
 description = "Reconstruct Arabic sentences to be used in applications that doesn't support Arabic script."
 license = "MIT"
-
+include = [
+    "default-config.ini",
+    "**/*.rs",
+    "Cargo.toml"
+    ]
 [dependencies]
 lazy_static = "1.0.2"
 regex = "1.0.2"
