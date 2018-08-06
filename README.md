@@ -32,6 +32,10 @@ println!("{}",arabic_reshape_r(text));
 // الغة العربية رائعة correctly rendred.
 ```
 
+## Todo:
+
+- [ ] bug fix,
+
 **Credits/More info:**
 
 Check the awesome original python version.
