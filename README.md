@@ -34,7 +34,6 @@ println!("{}",arabic_reshape_r(text));
 
 ## Todo:
 
-- [ ] bug fix
 - [ ] document the code
 
 **Credits/More info:**
