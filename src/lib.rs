@@ -29,12 +29,12 @@
 //! println!("{}",arabic_reshape_r(text));
 //! // الغة العربية رائعة correctly rendred.
 //! ```
-//! 
+//!
 //! **More info:**
-//! 
+//!
 //! Check the original python version.
-//! 
-//! [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) 
+//!
+//! [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper)
 
 #[macro_use]
 extern crate lazy_static;

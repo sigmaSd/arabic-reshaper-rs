@@ -15,6 +15,8 @@ lazy_static! {
         "[\u{0610}-\u{061a}\u{064b}-\u{065f}\u{0670}\u{06d6}-\u{06dc}\u{06df}-\u{06e8}\u{06ea}-\u{06ed}\u{08d4}-\u{08e1}\u{08d4}-\u{08ed}\u{08e3}-\u{08ff}]"
     ).unwrap();
 }
+const NOT_SUPPORTED: i16 = -1;
+const EMPTY: (char, i16) = ('e', NOT_SUPPORTED);
 
 pub struct ArabicReshaper {
     configuration: HashMap<String, bool>,
@@ -35,8 +37,7 @@ impl ArabicReshaper {
         let mut output = Vec::new();
         //const LETTER: i16 = 0;
         //const FORM: i16 = 1;
-        const NOT_SUPPORTED: i16 = -1;
-        const EMPTY: (char, i16) = ('e', NOT_SUPPORTED);
+
         let delete_harakat = self.configuration["delete_harakat"];
         let delete_tatweel = self.configuration["delete_tatweel"];
         let support_zwj = self.configuration["support_zwj"];
@@ -113,20 +114,8 @@ impl ArabicReshaper {
             output.pop();
         }
 
-        let mut idx = 0;
-        let mut current_len = output.len();
-        while idx < current_len {
-            let (char_o, _) = output[idx];
-            if char_o.is_ascii() {
-                idx += 1;
-            } else if char_o != ' ' {
-                output.insert(idx + 1, EMPTY);
-                idx += 2;
-                current_len = output.len();
-            } else {
-                idx += 1;
-            }
-        }
+        //adjust vector length to match text length
+        adjust_len(&mut output);
 
         if self.configuration["support_ligatures"] {
             let mut text = HARAKAT_RE.replace_all(text, "").into_owned();
@@ -182,10 +171,7 @@ impl ArabicReshaper {
                     forms[ligature_form as usize].chars().next().unwrap(),
                     NOT_SUPPORTED,
                 );
-                let v: Vec<(char, i16)> = repeat(("e", NOT_SUPPORTED))
-                    .take(b - 1 - a)
-                    .map(|(s, n)| (s.chars().next().unwrap(), n))
-                    .collect();
+                let v: Vec<(char, i16)> = repeat(EMPTY).take(b - 1 - a).collect();
 
                 let mut index = a + 1;
                 let mut v_index = 0;
@@ -242,4 +228,19 @@ impl ArabicReshaper {
 
 fn char_to_str(c: char) -> String {
     format!("{}", c)
+}
+
+fn adjust_len(v: &mut Vec<(char, i16)>) {
+    let mut idx = 0;
+    let mut current_len = v.len();
+    while idx < current_len {
+        let (char_o, _) = v[idx];
+        let len = char_o.len_utf8() - 1;
+        for _ in 0..len {
+            v.insert(idx + 1, EMPTY);
+            idx += 1;
+        }
+        idx += 1;
+        current_len = v.len();
+    }
 }
