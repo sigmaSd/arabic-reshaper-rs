@@ -62,12 +62,24 @@ pub fn arabic_reshape_l(text: &str) -> String {
     let text = arabic_reshape_r(text);
     let mut result: String = text
         .lines()
-        .map(|l| l.chars().rev().collect::<String>())
-        .map(|l| format!("{}\n", l))
+        .map(|l| {
+            l.split_whitespace()
+                .map(|w| {
+                    if !w.is_ascii() {
+                        w.chars().rev().collect::<String>()
+                    } else {
+                        w.to_string()
+                    }
+                }).map(|l| format!("{} ", l))
+                .rev()
+                .collect::<String>()
+        }).map(|l| format!("{}\n", l))
         .collect();
 
     //get rid of the last \n
-    result.pop().unwrap();
+    if !result.is_empty() {
+        result.pop().unwrap();
+    }
 
     result
 }
