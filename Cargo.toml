@@ -1,12 +1,13 @@
 [package]
 name = "arabic_reshaper"
-version = "0.1.6"
+version = "0.2.0"
 authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 readme = "README.md"
 description = "Reconstruct Arabic sentences to be used in applications that doesn't support Arabic script."
 repository = "https://github.com/sigmaSd/arabic-reshaper-rs"
 license = "MIT"
+edition = "2018"
 
 [dependencies]
-lazy_static = "1.0.2"
-regex = "1.0.2"
+regex = "1.3.3"
+once_cell = "1.2.0"

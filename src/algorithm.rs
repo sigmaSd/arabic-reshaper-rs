@@ -1,20 +1,18 @@
-extern crate regex;
-use self::regex::Regex;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
-use config_parser::parse;
-
-use letters::*;
-
-use ligatures::LIGATURES;
+use crate::config_parser::parse;
+use crate::letters::*;
+use crate::ligatures::LIGATURES;
 
 use std::collections::HashMap;
 use std::iter::repeat;
 
-lazy_static! {
-    static ref HARAKAT_RE: Regex = Regex::new(
+static HARAKAT_RE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(
         "[\u{0610}-\u{061a}\u{064b}-\u{065f}\u{0670}\u{06d6}-\u{06dc}\u{06df}-\u{06e8}\u{06ea}-\u{06ed}\u{08d4}-\u{08e1}\u{08d4}-\u{08ed}\u{08e3}-\u{08ff}]"
-    ).unwrap();
-}
+    ).unwrap()
+});
 const NOT_SUPPORTED: i16 = -1;
 const EMPTY: (char, i16) = ('e', NOT_SUPPORTED);
 
@@ -33,10 +31,9 @@ impl ArabicReshaper {
         }
     }
 
+    #[allow(clippy::cognitive_complexity)]
     pub fn reshape(&mut self, text: &str) -> String {
         let mut output = Vec::new();
-        //const LETTER: i16 = 0;
-        //const FORM: i16 = 1;
 
         let delete_harakat = self.configuration["delete_harakat"];
         let delete_tatweel = self.configuration["delete_tatweel"];
@@ -45,7 +42,7 @@ impl ArabicReshaper {
         let use_unshaped_instead_of_isolated =
             self.configuration["use_unshaped_instead_of_isolated"];
 
-        let mut position_harakat: HashMap<i16, Vec<(char)>> = HashMap::new();
+        let mut position_harakat: HashMap<i16, Vec<char>> = HashMap::new();
 
         let isolated_form = if use_unshaped_instead_of_isolated {
             UNSHAPED
@@ -56,7 +53,7 @@ impl ArabicReshaper {
             return text.to_string();
         };
         for letter in text.chars() {
-            if HARAKAT_RE.find(&char_to_str(letter)).is_some() {
+            if HARAKAT_RE.find(&letter.to_string()).is_some() {
                 let len = output.len();
                 if !delete_harakat {
                     let mut position = (len - 1) as i16;
@@ -67,17 +64,14 @@ impl ArabicReshaper {
                     position_harakat.entry(position).or_insert_with(Vec::new);
 
                     if shift_harakat_position {
-                        let mut v = position_harakat.entry(position).or_default();
+                        let v = position_harakat.entry(position).or_default();
                         v.insert(0, letter);
                     } else {
-                        let mut v = position_harakat.entry(position).or_default();
+                        let v = position_harakat.entry(position).or_default();
                         v.push(letter);
                     }
                 }
-            } else if letter == TATWEEL && delete_tatweel {
-            ;
-            } else if letter == ZWJ && !support_zwj {
-            ;
+            } else if letter == TATWEEL && delete_tatweel || letter == ZWJ && !support_zwj {
             } else if !LETTERS.contains_key(&letter) {
                 output.push((letter, NOT_SUPPORTED));
             } else if output.is_empty() {
@@ -86,14 +80,11 @@ impl ArabicReshaper {
                 let len = output.len();
                 let out_clone = output.clone();
                 let previous_letter = out_clone[len - 1];
-                if previous_letter.1 == NOT_SUPPORTED {
-                    output.push((letter, isolated_form));
-                } else if !connects_with_letter_before(letter) {
-                    output.push((letter, isolated_form));
-                } else if !connects_with_letter_after(previous_letter.0) {
-                    output.push((letter, isolated_form));
-                } else if previous_letter.1 == FINAL
-                    && !connects_with_letters_before_and_after(previous_letter.0)
+                if (previous_letter.1 == NOT_SUPPORTED)
+                    || (!connects_with_letter_before(letter))
+                    || (!connects_with_letter_after(previous_letter.0))
+                    || (previous_letter.1 == FINAL
+                        && !connects_with_letters_before_and_after(previous_letter.0))
                 {
                     output.push((letter, isolated_form));
                 } else if previous_letter.1 == isolated_form {
@@ -139,7 +130,7 @@ impl ArabicReshaper {
 
                 let a_form = output[a].1;
                 let b_form = output[b - 2].1;
-                let mut ligature_form;
+                let ligature_form;
 
                 // +-----------+----------+---------+---------+----------+
                 // | a   \   b | ISOLATED | INITIAL | MEDIAL  | FINAL    |
@@ -156,12 +147,10 @@ impl ArabicReshaper {
                     } else {
                         ligature_form = INITIAL;
                     }
+                } else if b_form == isolated_form || b_form == FINAL {
+                    ligature_form = FINAL;
                 } else {
-                    if b_form == isolated_form || b_form == FINAL {
-                        ligature_form = FINAL;
-                    } else {
-                        ligature_form = MEDIAL;
-                    }
+                    ligature_form = MEDIAL;
                 }
 
                 if forms[ligature_form as usize] == "" {
@@ -224,10 +213,6 @@ impl ArabicReshaper {
 
         Regex::new(&self.patterns.join("|")).unwrap()
     }
-}
-
-fn char_to_str(c: char) -> String {
-    format!("{}", c)
 }
 
 fn adjust_len(v: &mut Vec<(char, i16)>) {
