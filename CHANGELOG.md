@@ -1,3 +1,8 @@
+**0.2.1**
+- Improve error handling
+- Updates dependencies
+- Fix clippy warnings
+
 **0.2.0**
 - Update to rust 2018 edition
 - Update all dependencies
