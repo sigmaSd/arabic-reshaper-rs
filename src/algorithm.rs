@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::iter::repeat;
 
 static HARAKAT_RE: Lazy<Regex> = Lazy::new(|| {
+    // correct Regex -> safe unwrap
     Regex::new(
         "[\u{0610}-\u{061a}\u{064b}-\u{065f}\u{0670}\u{06d6}-\u{06dc}\u{06df}-\u{06e8}\u{06ea}-\u{06ed}\u{08d4}-\u{08e1}\u{08d4}-\u{08ed}\u{08e3}-\u{08ff}]"
     ).unwrap()
