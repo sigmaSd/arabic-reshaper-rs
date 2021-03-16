@@ -4,6 +4,8 @@ Reconstruct Arabic sentences to be used in applications that don't support Arabi
 
 This crate is [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) ported to rust.
 
+Like `python-arabic-reshaper` it reshapes the letters, but it doesnt reverse the writing, the user is responsible for that: you can look at [Unicode bidirectional algorithm](http://unicode.org/reports/tr9/) or simply try reversing the characters orders and see if that works for you
+
 ## Usage:
 
 `arabic_reshape`:
