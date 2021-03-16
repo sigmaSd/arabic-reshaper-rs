@@ -153,7 +153,7 @@ impl ArabicReshaper {
                     ligature_form = MEDIAL;
                 }
 
-                if forms[ligature_form as usize] == "" {
+                if forms[ligature_form as usize].is_empty() {
                     continue;
                 }
                 output[a] = (

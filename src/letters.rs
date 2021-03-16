@@ -194,7 +194,7 @@ pub fn connects_with_letter_before(letter: char) -> bool {
     }
     let forms = LETTERS[&letter];
 
-    if forms[FINAL as usize] != "" || forms[MEDIAL as usize] != "" {
+    if !forms[FINAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
         return true;
     }
 
@@ -207,7 +207,7 @@ pub fn connects_with_letter_after(letter: char) -> bool {
     }
     let forms = LETTERS[&letter];
 
-    if forms[INITIAL as usize] != "" || forms[MEDIAL as usize] != "" {
+    if !forms[INITIAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
         return true;
     }
 
@@ -220,7 +220,7 @@ pub fn connects_with_letters_before_and_after(letter: char) -> bool {
     }
     let forms = LETTERS[&letter];
 
-    if forms[MEDIAL as usize] != "" {
+    if !forms[MEDIAL as usize].is_empty() {
         return true;
     }
 
