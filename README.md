@@ -18,6 +18,9 @@ let salam = "سلام";
 println!("{}",arabic_reshape(salam));
 // سلام correctly rendred.
 ```
+### CLI:
+
+[`rtl_reshaper_rs`](https://github.com/NightMachinary/rtl_reshaper_rs) is a CLI frontend available that reshapes and reorders `stdin`.
 
 ## Todo:
 
