@@ -1,3 +1,6 @@
+**0.3.1**
+- Remove unneeded character number limitation
+
 **0.3.0**
 - Port most of the python tests to rust
 - Lots of bug fixes
