@@ -106,9 +106,6 @@ impl ArabicReshaper {
             output.pop();
         }
 
-        //adjust vector length to match text length
-        adjust_len(&mut output);
-
         if self.configuration["support_ligatures"] {
             let mut text = HARAKAT_RE.replace_all(text, "").into_owned();
 
@@ -177,13 +174,11 @@ impl ArabicReshaper {
             result.extend(position_harakat[&-1].clone());
         }
         for (i, o) in output.iter().enumerate() {
-            if o.0 != 'e' {
-                if o.1 == NOT_SUPPORTED || o.1 == UNSHAPED {
-                    result.push(o.0);
-                } else {
-                    let unc = LETTERS[&o.0][o.1 as usize];
-                    result.push(unc.chars().next().unwrap());
-                }
+            if o.1 == NOT_SUPPORTED || o.1 == UNSHAPED {
+                result.push(o.0);
+            } else {
+                let unc = LETTERS[&o.0][o.1 as usize];
+                result.push(unc.chars().next().unwrap());
             }
             if !delete_harakat && position_harakat.contains_key(&(i as i16)) {
                 result.extend(position_harakat[&(i as i16)].clone());
@@ -213,20 +208,5 @@ impl ArabicReshaper {
         }
 
         Regex::new(&self.patterns.join("|")).unwrap()
-    }
-}
-
-fn adjust_len(v: &mut Vec<(char, i16)>) {
-    let mut idx = 0;
-    let mut current_len = v.len();
-    while idx < current_len {
-        let (char_o, _) = v[idx];
-        let len = char_o.len_utf8() - 1;
-        for _ in 0..len {
-            v.insert(idx + 1, EMPTY);
-            idx += 1;
-        }
-        idx += 1;
-        current_len = v.len();
     }
 }
