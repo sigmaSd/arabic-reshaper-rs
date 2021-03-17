@@ -26,7 +26,7 @@ pub mod letters;
 mod ligatures;
 
 mod algorithm;
-use algorithm::ArabicReshaper;
+pub use algorithm::ArabicReshaper;
 
 pub fn arabic_reshape(text: &str) -> String {
     let mut ar = ArabicReshaper::new();

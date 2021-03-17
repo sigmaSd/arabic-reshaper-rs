@@ -1,6 +1,7 @@
 use arabic_reshaper::arabic_reshape;
 use arabic_reshaper::letters::LETTERS;
 use arabic_reshaper::letters::{FINAL, INITIAL, ISOLATED, MEDIAL, ZWJ};
+use arabic_reshaper::ArabicReshaper;
 
 #[test]
 fn reshape_test() {
@@ -97,83 +98,37 @@ fn test_zwj_reshaping() {
         assert_eq!(arabic_reshape(&case.0), case.1);
     });
 }
+#[test]
+fn test_reshaping_with_harakat() {
+    let mut reshaper = ArabicReshaper::new();
+    *reshaper.configuration.get_mut("delete_harakat").unwrap() = false;
+
+    let cases = [
+        ("السَلَاْمٌ عَلَيْكُمْ", "ﺍﻟﺴَﻼَْﻡٌ ﻋَﻠَﻴْﻜُﻢْ"),
+        (
+            "اللغة العربية هي أكثر اللغات",
+            "ﺍﻟﻠﻐﺔ ﺍﻟﻌﺮﺑﻴﺔ ﻫﻲ ﺃﻛﺜﺮ ﺍﻟﻠﻐﺎﺕ",
+        ),
+        ("تحدثاً ونطقاً ضمن مجموعة", "ﺗﺤﺪﺛﺎً ﻭﻧﻄﻘﺎً ﺿﻤﻦ ﻣﺠﻤﻮﻋﺔ"),
+        ("اللغات السامية", "ﺍﻟﻠﻐﺎﺕ ﺍﻟﺴﺎﻣﻴﺔ"),
+        ("العربية لغة رسمية في", "ﺍﻟﻌﺮﺑﻴﺔ ﻟﻐﺔ ﺭﺳﻤﻴﺔ ﻓﻲ"),
+        ("كل دول الوطن العربي", "ﻛﻞ ﺩﻭﻝ ﺍﻟﻮﻃﻦ ﺍﻟﻌﺮﺑﻲ"),
+        ("إضافة إلى كونها لغة", "ﺇﺿﺎﻓﺔ ﺇﻟﻰ ﻛﻮﻧﻬﺎ ﻟﻐﺔ"),
+        ("رسمية في تشاد وإريتريا", "ﺭﺳﻤﻴﺔ ﻓﻲ ﺗﺸﺎﺩ ﻭﺇﺭﻳﺘﺮﻳﺎ"),
+        ("وإسرائيل. وهي إحدى اللغات", "ﻭﺇﺳﺮﺍﺋﻴﻞ. ﻭﻫﻲ ﺇﺣﺪﻯ ﺍﻟﻠﻐﺎﺕ"),
+        ("الرسمية الست في منظمة", "ﺍﻟﺮﺳﻤﻴﺔ ﺍﻟﺴﺖ ﻓﻲ ﻣﻨﻈﻤﺔ"),
+        ("الأمم المتحدة، ويُحتفل", "ﺍﻷﻣﻢ ﺍﻟﻤﺘﺤﺪﺓ، ﻭﻳُﺤﺘﻔﻞ"),
+        ("باليوم العالمي للغة العربية", "ﺑﺎﻟﻴﻮﻡ ﺍﻟﻌﺎﻟﻤﻲ ﻟﻠﻐﺔ ﺍﻟﻌﺮﺑﻴﺔ"),
+        ("في 18 ديسمبر كذكرى اعتماد", "ﻓﻲ 18 ﺩﻳﺴﻤﺒﺮ ﻛﺬﻛﺮﻯ ﺍﻋﺘﻤﺎﺩ"),
+        ("العربية بين لغات العمل في", "ﺍﻟﻌﺮﺑﻴﺔ ﺑﻴﻦ ﻟﻐﺎﺕ ﺍﻟﻌﻤﻞ ﻓﻲ"),
+        ("الأمم المتحدة.", "ﺍﻷﻣﻢ ﺍﻟﻤﺘﺤﺪﺓ."),
+    ];
+    cases.iter().for_each(|case| {
+        assert_eq!(reshaper.reshape(&case.0), case.1);
+    });
+}
+
 /*
-class TestZWJReshaping(unittest.TestCase):
-    def setUp(self):
-        self.reshaper = arabic_reshaper.default_reshaper
-
-        beh = "ب"
-        beh_ISOLATED = LETTERS[BEH][letters.ISOLATED]
-        beh_INITIAL = LETTERS[BEH][letters.INITIAL]
-        beh_MEDIAL = LETTERS[BEH][letters.MEDIAL]
-        beh_FINAL = LETTERS[BEH][letters.FINAL]
-
-        ALEF = "ا"
-        ALEF_ISOLATED = LETTERS[ALEF][letters.ISOLATED]
-        ALEF_FINAL = LETTERS[ALEF][letters.FINAL]
-
-        HAMZA = "ء"
-        HAMZA_ISOLATED = LETTERS[HAMZA][letters.ISOLATED]
-
-        self.cases = (
-            (
-                beh + HAMZA,
-                beh_ISOLATED + HAMZA_ISOLATED
-            ),
-            (
-                letters.ZWJ + beh + HAMZA,
-                beh_FINAL + HAMZA_ISOLATED
-            ),
-            (
-                letters.ZWJ + beh,
-                beh_FINAL
-            ),
-            (
-                beh + letters.ZWJ,
-                beh_INITIAL
-            ),
-            (
-                letters.ZWJ + beh + letters.ZWJ,
-                beh_MEDIAL
-            ),
-            (
-                beh + letters.ZWJ + HAMZA,
-                beh_INITIAL + HAMZA_ISOLATED
-            ),
-            (
-                beh + ALEF,
-               beh_INITIAL + ALEF_FINAL
-            ),
-            (
-                beh + letters.ZWJ + ALEF,
-                beh_INITIAL + ALEF_FINAL
-            ),
-            (
-                beh + letters.ZWJ + ALEF + letters.ZWJ,
-                beh_INITIAL + ALEF_FINAL
-            ),
-            (
-                beh + ALEF + BEH,
-                beh_INITIAL + ALEF_FINAL + BEH_ISOLATED
-            ),
-            (
-                beh + letters.ZWJ + ALEF + letters.ZWJ + BEH,
-                beh_INITIAL + ALEF_FINAL + BEH_FINAL
-            ),
-            (
-                beh + letters.ZWJ + HAMZA + BEH,
-                beh_INITIAL + HAMZA_ISOLATED + BEH_ISOLATED
-            ),
-            (
-                beh + letters.ZWJ + HAMZA + letters.ZWJ + BEH,
-                beh_INITIAL + HAMZA_ISOLATED + BEH_FINAL
-            ),
-        )
-
-    def test_reshaping(self):
-        _reshaping_test(self)
-
-
 class TestReshapingWithHarakat(unittest.TestCase):
     def setUp(self):
         self.reshaper = arabic_reshaper.ArabicReshaper({
