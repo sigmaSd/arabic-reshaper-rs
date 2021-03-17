@@ -19,7 +19,7 @@ println!("{}",arabic_reshape(salam));
 // سلام correctly rendred.
 ```
 
-Checkout the tests folder for more examples.
+Checkout the tests directory for more examples.
 
 ### CLI:
 

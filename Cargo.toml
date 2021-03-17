@@ -1,6 +1,6 @@
 [package]
 name = "arabic_reshaper"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 readme = "README.md"
 description = "Reconstruct Arabic sentences to be used in applications that doesn't support Arabic script."
