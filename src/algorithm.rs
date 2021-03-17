@@ -15,7 +15,19 @@ static HARAKAT_RE: Lazy<Regex> = Lazy::new(|| {
     ).unwrap()
 });
 const NOT_SUPPORTED: i16 = -1;
-const EMPTY: (char, i16) = ('e', NOT_SUPPORTED);
+const EMPTY: (CharType, i16) = (CharType::Unsupported, NOT_SUPPORTED);
+
+#[derive(Copy, Clone)]
+enum CharType {
+    Supported(char),
+    Unsupported,
+}
+
+impl From<char> for CharType {
+    fn from(c: char) -> Self {
+        CharType::Supported(c)
+    }
+}
 
 pub struct ArabicReshaper {
     configuration: HashMap<String, bool>,
@@ -106,6 +118,11 @@ impl ArabicReshaper {
             output.pop();
         }
 
+        let mut output: Vec<(CharType, i16)> = output
+            .into_iter()
+            .map(|(c, i)| (CharType::from(c), i))
+            .collect();
+
         if self.configuration["support_ligatures"] {
             let mut text = HARAKAT_RE.replace_all(text, "").into_owned();
 
@@ -113,21 +130,26 @@ impl ArabicReshaper {
                 text = text.replace(TATWEEL, "");
             }
 
-            for re_match in self.ligature_re().find_iter(&text) {
-                let mut group_index = 4;
-                for (index, letter_group) in self.ligature_re().as_str().split('|').enumerate() {
-                    if letter_group == re_match.as_str() {
-                        group_index = index;
-                        break;
-                    }
-                }
+            for re_match in self.ligature_re().captures_iter(&text) {
+                // find the group index in the ligature_re patterns
+                let (group_index, re_match) = re_match
+                    .iter()
+                    .skip(1)
+                    .enumerate()
+                    .find(|(_, g)| g.is_some())
+                    .unwrap();
 
-                let (a, b) = (re_match.start(), re_match.end());
+                let re_match = re_match.unwrap();
+
+                //regex returns bytes offset
+                //we want character position
+                let a = text[..re_match.start()].chars().count();
+                let b = text[..re_match.end()].chars().count();
 
                 let forms = self.re_group_index_to_ligature_forms[&group_index];
 
                 let a_form = output[a].1;
-                let b_form = output[b - 2].1;
+                let b_form = output[b - 1].1;
                 let ligature_form;
 
                 // +-----------+----------+---------+---------+----------+
@@ -141,7 +163,7 @@ impl ArabicReshaper {
 
                 if a_form == isolated_form || a_form == INITIAL {
                     if b_form == isolated_form || b_form == FINAL {
-                        ligature_form = FINAL;
+                        ligature_form = ISOLATED;
                     } else {
                         ligature_form = INITIAL;
                     }
@@ -155,10 +177,10 @@ impl ArabicReshaper {
                     continue;
                 }
                 output[a] = (
-                    forms[ligature_form as usize].chars().next().unwrap(),
+                    forms[ligature_form as usize].chars().next().unwrap().into(),
                     NOT_SUPPORTED,
                 );
-                let v: Vec<(char, i16)> = repeat(EMPTY).take(b - 1 - a).collect();
+                let v: Vec<(CharType, i16)> = repeat(EMPTY).take(b - 1 - a).collect();
 
                 let mut index = a + 1;
                 let mut v_index = 0;
@@ -174,11 +196,13 @@ impl ArabicReshaper {
             result.extend(position_harakat[&-1].clone());
         }
         for (i, o) in output.iter().enumerate() {
-            if o.1 == NOT_SUPPORTED || o.1 == UNSHAPED {
-                result.push(o.0);
-            } else {
-                let unc = LETTERS[&o.0][o.1 as usize];
-                result.push(unc.chars().next().unwrap());
+            if let CharType::Supported(c) = o.0 {
+                if o.1 == NOT_SUPPORTED || o.1 == UNSHAPED {
+                    result.push(c);
+                } else {
+                    let unc = LETTERS[&c][o.1 as usize];
+                    result.push(unc.chars().next().unwrap());
+                }
             }
             if !delete_harakat && position_harakat.contains_key(&(i as i16)) {
                 result.extend(position_harakat[&(i as i16)].clone());
@@ -202,7 +226,7 @@ impl ArabicReshaper {
 
                 self.re_group_index_to_ligature_forms
                     .insert(index, replacement.1);
-                self.patterns.push(replacement.0.to_string());
+                self.patterns.push("(".to_string() + &replacement.0 + ")");
                 index += 1;
             }
         }
