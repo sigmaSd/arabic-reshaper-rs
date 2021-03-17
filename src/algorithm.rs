@@ -35,6 +35,12 @@ pub struct ArabicReshaper {
     patterns: Vec<String>,
 }
 
+impl Default for ArabicReshaper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ArabicReshaper {
     pub fn new() -> Self {
         Self {
@@ -226,7 +232,7 @@ impl ArabicReshaper {
 
                 self.re_group_index_to_ligature_forms
                     .insert(index, replacement.1);
-                self.patterns.push("(".to_string() + &replacement.0 + ")");
+                self.patterns.push("(".to_string() + replacement.0 + ")");
                 index += 1;
             }
         }
