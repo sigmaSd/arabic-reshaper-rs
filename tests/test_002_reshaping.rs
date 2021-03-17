@@ -1,4 +1,6 @@
 use arabic_reshaper::arabic_reshape;
+use arabic_reshaper::letters::LETTERS;
+use arabic_reshaper::letters::{FINAL, INITIAL, ISOLATED, MEDIAL, ZWJ};
 
 #[test]
 fn reshape_test() {
@@ -24,81 +26,147 @@ fn reshape_test() {
         ("الأمم المتحدة.", "ﺍﻷﻣﻢ ﺍﻟﻤﺘﺤﺪﺓ."),
     ];
     cases.iter().for_each(|case| {
-        println!("{:?}", case);
         assert_eq!(arabic_reshape(case.0), case.1);
     });
 }
 
+#[test]
+fn test_zwj_reshaping() {
+    let beh = 'ب';
+    let beh_isolated = LETTERS[&beh][ISOLATED as usize];
+    let beh_initial = LETTERS[&beh][INITIAL as usize];
+    let beh_medial = LETTERS[&beh][MEDIAL as usize];
+    let beh_final = LETTERS[&beh][FINAL as usize];
+
+    let alef = 'ا';
+    let alef_final = LETTERS[&alef][FINAL as usize];
+
+    let hamza = 'ء';
+    let hamza_isolated = LETTERS[&hamza][ISOLATED as usize];
+
+    let beh = beh.to_string();
+    let beh_isolated = beh_isolated.to_string();
+    let beh_initial = beh_initial.to_string();
+    let beh_final = beh_final.to_string();
+    let beh_medial = beh_medial.to_string();
+    let hamza = hamza.to_string();
+    let hamza_isolated = hamza_isolated.to_string();
+    let zwj = ZWJ.to_string();
+    let alef = alef.to_string();
+
+    let cases = [
+        (beh.clone() + &hamza, beh_isolated.clone() + &hamza_isolated),
+        (
+            zwj.clone() + &beh + &hamza,
+            beh_final.clone() + &hamza_isolated,
+        ),
+        (zwj.clone() + &beh, beh_final.clone()),
+        (beh.clone() + &zwj, beh_initial.clone()),
+        (zwj.clone() + &beh + &zwj, beh_medial),
+        (
+            beh.clone() + &zwj + &hamza,
+            beh_initial.clone() + &hamza_isolated,
+        ),
+        (beh.clone() + &alef, beh_initial.clone() + &alef_final),
+        (
+            beh.clone() + &zwj + &alef,
+            beh_initial.clone() + &alef_final,
+        ),
+        (
+            beh.clone() + &zwj + &alef + &zwj,
+            beh_initial.clone() + &alef_final,
+        ),
+        (
+            beh.clone() + &alef + &beh,
+            beh_initial.clone() + &alef_final + &beh_isolated,
+        ),
+        (
+            beh.clone() + &zwj + &alef + &zwj + &beh,
+            beh_initial.clone() + &alef_final + &beh_final,
+        ),
+        (
+            beh.clone() + &zwj + &hamza + &beh,
+            beh_initial.clone() + &hamza_isolated + &beh_isolated,
+        ),
+        (
+            beh.clone() + &zwj + &hamza + &zwj + &beh,
+            beh_initial + &hamza_isolated + &beh_final,
+        ),
+    ];
+    cases.iter().for_each(|case| {
+        assert_eq!(arabic_reshape(&case.0), case.1);
+    });
+}
 /*
 class TestZWJReshaping(unittest.TestCase):
     def setUp(self):
         self.reshaper = arabic_reshaper.default_reshaper
 
-        BEH = "ب"
-        BEH_ISOLATED = arabic_reshaper.letters.LETTERS_ARABIC[BEH][letters.ISOLATED]
-        BEH_INITIAL = arabic_reshaper.letters.LETTERS_ARABIC[BEH][letters.INITIAL]
-        BEH_MEDIAL = arabic_reshaper.letters.LETTERS_ARABIC[BEH][letters.MEDIAL]
-        BEH_FINAL = arabic_reshaper.letters.LETTERS_ARABIC[BEH][letters.FINAL]
+        beh = "ب"
+        beh_ISOLATED = LETTERS[BEH][letters.ISOLATED]
+        beh_INITIAL = LETTERS[BEH][letters.INITIAL]
+        beh_MEDIAL = LETTERS[BEH][letters.MEDIAL]
+        beh_FINAL = LETTERS[BEH][letters.FINAL]
 
         ALEF = "ا"
-        ALEF_ISOLATED = arabic_reshaper.letters.LETTERS_ARABIC[ALEF][letters.ISOLATED]
-        ALEF_FINAL = arabic_reshaper.letters.LETTERS_ARABIC[ALEF][letters.FINAL]
+        ALEF_ISOLATED = LETTERS[ALEF][letters.ISOLATED]
+        ALEF_FINAL = LETTERS[ALEF][letters.FINAL]
 
         HAMZA = "ء"
-        HAMZA_ISOLATED = arabic_reshaper.letters.LETTERS_ARABIC[HAMZA][letters.ISOLATED]
+        HAMZA_ISOLATED = LETTERS[HAMZA][letters.ISOLATED]
 
         self.cases = (
             (
-                BEH + HAMZA,
-                BEH_ISOLATED + HAMZA_ISOLATED
+                beh + HAMZA,
+                beh_ISOLATED + HAMZA_ISOLATED
             ),
             (
-                letters.ZWJ + BEH + HAMZA,
-                BEH_FINAL + HAMZA_ISOLATED
+                letters.ZWJ + beh + HAMZA,
+                beh_FINAL + HAMZA_ISOLATED
             ),
             (
-                letters.ZWJ + BEH,
-                BEH_FINAL
+                letters.ZWJ + beh,
+                beh_FINAL
             ),
             (
-                BEH + letters.ZWJ,
-                BEH_INITIAL
+                beh + letters.ZWJ,
+                beh_INITIAL
             ),
             (
-                letters.ZWJ + BEH + letters.ZWJ,
-                BEH_MEDIAL
+                letters.ZWJ + beh + letters.ZWJ,
+                beh_MEDIAL
             ),
             (
-                BEH + letters.ZWJ + HAMZA,
-                BEH_INITIAL + HAMZA_ISOLATED
+                beh + letters.ZWJ + HAMZA,
+                beh_INITIAL + HAMZA_ISOLATED
             ),
             (
-                BEH + ALEF,
-               BEH_INITIAL + ALEF_FINAL
+                beh + ALEF,
+               beh_INITIAL + ALEF_FINAL
             ),
             (
-                BEH + letters.ZWJ + ALEF,
-                BEH_INITIAL + ALEF_FINAL
+                beh + letters.ZWJ + ALEF,
+                beh_INITIAL + ALEF_FINAL
             ),
             (
-                BEH + letters.ZWJ + ALEF + letters.ZWJ,
-                BEH_INITIAL + ALEF_FINAL
+                beh + letters.ZWJ + ALEF + letters.ZWJ,
+                beh_INITIAL + ALEF_FINAL
             ),
             (
-                BEH + ALEF + BEH,
-                BEH_INITIAL + ALEF_FINAL + BEH_ISOLATED
+                beh + ALEF + BEH,
+                beh_INITIAL + ALEF_FINAL + BEH_ISOLATED
             ),
             (
-                BEH + letters.ZWJ + ALEF + letters.ZWJ + BEH,
-                BEH_INITIAL + ALEF_FINAL + BEH_FINAL
+                beh + letters.ZWJ + ALEF + letters.ZWJ + BEH,
+                beh_INITIAL + ALEF_FINAL + BEH_FINAL
             ),
             (
-                BEH + letters.ZWJ + HAMZA + BEH,
-                BEH_INITIAL + HAMZA_ISOLATED + BEH_ISOLATED
+                beh + letters.ZWJ + HAMZA + BEH,
+                beh_INITIAL + HAMZA_ISOLATED + BEH_ISOLATED
             ),
             (
-                BEH + letters.ZWJ + HAMZA + letters.ZWJ + BEH,
-                BEH_INITIAL + HAMZA_ISOLATED + BEH_FINAL
+                beh + letters.ZWJ + HAMZA + letters.ZWJ + BEH,
+                beh_INITIAL + HAMZA_ISOLATED + BEH_FINAL
             ),
         )
 
