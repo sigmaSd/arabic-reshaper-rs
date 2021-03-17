@@ -68,9 +68,7 @@ impl ArabicReshaper {
         } else {
             ISOLATED
         };
-        if text.len() < 3 {
-            return text.to_string();
-        };
+
         for letter in text.chars() {
             if HARAKAT_RE.find(&letter.to_string()).is_some() {
                 let len = output.len() as i16;
