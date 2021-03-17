@@ -22,6 +22,7 @@
 //! [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper)
 
 mod config_parser;
+#[doc(hidden)]
 pub mod letters;
 mod ligatures;
 
