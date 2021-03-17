@@ -67,9 +67,9 @@ impl ArabicReshaper {
         };
         for letter in text.chars() {
             if HARAKAT_RE.find(&letter.to_string()).is_some() {
-                let len = output.len();
+                let len = output.len() as i16;
                 if !delete_harakat {
-                    let mut position = (len - 1) as i16;
+                    let mut position = len - 1;
                     if shift_harakat_position {
                         position -= 1;
                     }

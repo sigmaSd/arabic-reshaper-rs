@@ -157,35 +157,23 @@ fn test_reshaping_with_harakat_without_ligatures() {
         assert_eq!(reshaper.reshape(&case.0), case.1);
     });
 }
+
+#[test]
+fn test_reshaping_with_shifted_harakat_without_ligatures() {
+    let mut reshaper = ArabicReshaper::new();
+    *reshaper.configuration.get_mut("delete_harakat").unwrap() = false;
+    *reshaper.configuration.get_mut("support_ligatures").unwrap() = false;
+    *reshaper
+        .configuration
+        .get_mut("shift_harakat_position")
+        .unwrap() = true;
+
+    let cases = [("فُعِلَ", "ُﻓِﻌَﻞ"), ("فُعِّلَ", "ُﻓِّﻌَﻞ")];
+    cases.iter().for_each(|case| {
+        assert_eq!(reshaper.reshape(&case.0), case.1);
+    });
+}
 /*
-class TestReshapingWithHarakatWithoutLigatures(unittest.TestCase):
-    def setUp(self):
-        self.reshaper = arabic_reshaper.ArabicReshaper({
-            "delete_harakat": False,
-            "support_ligatures": False
-        })
-        self.cases = (
-            ("السَلَاْمٌ عَلَيْكُمْ", "ﺍﻟﺴَﻠَﺎْﻡٌ ﻋَﻠَﻴْﻜُﻢْ"),
-            ("اللغة العربية هي أكثر اللغات", "ﺍﻟﻠﻐﺔ ﺍﻟﻌﺮﺑﻴﺔ ﻫﻲ ﺃﻛﺜﺮ ﺍﻟﻠﻐﺎﺕ"),
-            ("تحدثاً ونطقاً ضمن مجموعة", "ﺗﺤﺪﺛﺎً ﻭﻧﻄﻘﺎً ﺿﻤﻦ ﻣﺠﻤﻮﻋﺔ"),
-            ("اللغات السامية", "ﺍﻟﻠﻐﺎﺕ ﺍﻟﺴﺎﻣﻴﺔ"),
-            ("العربية لغة رسمية في",  "ﺍﻟﻌﺮﺑﻴﺔ ﻟﻐﺔ ﺭﺳﻤﻴﺔ ﻓﻲ"),
-            ("كل دول الوطن العربي",  "ﻛﻞ ﺩﻭﻝ ﺍﻟﻮﻃﻦ ﺍﻟﻌﺮﺑﻲ"),
-            ("إضافة إلى كونها لغة",  "ﺇﺿﺎﻓﺔ ﺇﻟﻰ ﻛﻮﻧﻬﺎ ﻟﻐﺔ"),
-            ("رسمية في تشاد وإريتريا",  "ﺭﺳﻤﻴﺔ ﻓﻲ ﺗﺸﺎﺩ ﻭﺇﺭﻳﺘﺮﻳﺎ"),
-            ("وإسرائيل. وهي إحدى اللغات",  "ﻭﺇﺳﺮﺍﺋﻴﻞ. ﻭﻫﻲ ﺇﺣﺪﻯ ﺍﻟﻠﻐﺎﺕ"),
-            ("الرسمية الست في منظمة",  "ﺍﻟﺮﺳﻤﻴﺔ ﺍﻟﺴﺖ ﻓﻲ ﻣﻨﻈﻤﺔ"),
-            ("الأمم المتحدة، ويُحتفل",  "ﺍﻟﺄﻣﻢ ﺍﻟﻤﺘﺤﺪﺓ، ﻭﻳُﺤﺘﻔﻞ"),
-            ("باليوم العالمي للغة العربية",  "ﺑﺎﻟﻴﻮﻡ ﺍﻟﻌﺎﻟﻤﻲ ﻟﻠﻐﺔ ﺍﻟﻌﺮﺑﻴﺔ"),
-            ("في 18 ديسمبر كذكرى اعتماد",  "ﻓﻲ 18 ﺩﻳﺴﻤﺒﺮ ﻛﺬﻛﺮﻯ ﺍﻋﺘﻤﺎﺩ"),
-            ("العربية بين لغات العمل في",  "ﺍﻟﻌﺮﺑﻴﺔ ﺑﻴﻦ ﻟﻐﺎﺕ ﺍﻟﻌﻤﻞ ﻓﻲ"),
-            ("الأمم المتحدة.", "ﺍﻟﺄﻣﻢ ﺍﻟﻤﺘﺤﺪﺓ."),
-        )
-
-    def test_reshaping(self):
-        _reshaping_test(self)
-
-
 class TestReshapingWithShiftedHarakatWithoutLigatures(unittest.TestCase):
     def setUp(self):
         self.reshaper = arabic_reshaper.ArabicReshaper({
