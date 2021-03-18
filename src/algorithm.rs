@@ -1,4 +1,3 @@
-use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::config_parser::parse;
@@ -8,12 +7,18 @@ use crate::ligatures::LIGATURES;
 use std::collections::HashMap;
 use std::iter::repeat;
 
-static HARAKAT_RE: Lazy<Regex> = Lazy::new(|| {
-    // correct Regex -> safe unwrap
-    Regex::new(
-        "[\u{0610}-\u{061a}\u{064b}-\u{065f}\u{0670}\u{06d6}-\u{06dc}\u{06df}-\u{06e8}\u{06ea}-\u{06ed}\u{08d4}-\u{08e1}\u{08d4}-\u{08ed}\u{08e3}-\u{08ff}]"
-    ).unwrap()
-});
+static HARAKAT_RE: [std::ops::Range<char>; 9] = [
+    '\u{0610}'..'\u{061a}',
+    '\u{064b}'..'\u{065f}',
+    '\u{0670}'..'\u{0670}',
+    '\u{06d6}'..'\u{06dc}',
+    '\u{06df}'..'\u{06e8}',
+    '\u{06ea}'..'\u{06ed}',
+    '\u{08d4}'..'\u{08e1}',
+    '\u{08d4}'..'\u{08ed}',
+    '\u{08e3}'..'\u{08ff}',
+];
+
 const NOT_SUPPORTED: i16 = -1;
 const EMPTY: (CharType, i16) = (CharType::Unsupported, NOT_SUPPORTED);
 
@@ -70,7 +75,7 @@ impl ArabicReshaper {
         };
 
         for letter in text.chars() {
-            if HARAKAT_RE.find(&letter.to_string()).is_some() {
+            if HARAKAT_RE.iter().any(|r| r.contains(&letter)) {
                 let len = output.len() as i16;
                 if !delete_harakat {
                     let mut position = len - 1;
@@ -128,7 +133,16 @@ impl ArabicReshaper {
             .collect();
 
         if self.configuration["support_ligatures"] {
-            let mut text = HARAKAT_RE.replace_all(text, "").into_owned();
+            let mut text: String = text
+                .chars()
+                .filter_map(|c| {
+                    if HARAKAT_RE.iter().any(|r| r.contains(&c)) {
+                        None
+                    } else {
+                        Some(c)
+                    }
+                })
+                .collect();
 
             if delete_tatweel {
                 text = text.replace(TATWEEL, "");
