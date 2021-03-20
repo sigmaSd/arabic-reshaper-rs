@@ -7,6 +7,3 @@ description = "Reconstruct Arabic sentences to be used in applications that does
 repository = "https://github.com/sigmaSd/arabic-reshaper-rs"
 license = "MIT"
 edition = "2018"
-
-[dependencies]
-regex = "1.4.5"

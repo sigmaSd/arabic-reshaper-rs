@@ -1,5 +1,3 @@
-use regex::Regex;
-
 use crate::config_parser::parse;
 use crate::letters::*;
 use crate::ligatures::LIGATURES;
@@ -34,19 +32,19 @@ impl From<char> for CharType {
     }
 }
 
-pub struct ArabicReshaper {
+pub struct ArabicReshaper<'a> {
     pub configuration: HashMap<String, bool>,
     re_group_index_to_ligature_forms: HashMap<usize, [&'static str; 4]>,
-    patterns: Vec<String>,
+    patterns: Vec<&'a str>,
 }
 
-impl Default for ArabicReshaper {
+impl Default for ArabicReshaper<'_> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl ArabicReshaper {
+impl ArabicReshaper<'_> {
     pub fn new() -> Self {
         Self {
             configuration: parse(),
@@ -142,21 +140,17 @@ impl ArabicReshaper {
                 text = text.replace(TATWEEL, "");
             }
 
-            for re_match in self.ligature_re().captures_iter(&text) {
-                // find the group index in the ligature_re patterns
-                let (group_index, re_match) = re_match
-                    .iter()
-                    .skip(1)
-                    .enumerate()
-                    .find(|(_, g)| g.is_some())
-                    .unwrap();
+            // fill patterns
+            self.ligature_re();
 
-                let re_match = re_match.unwrap();
+            // find patter matches in text
+            for re_match in captures_iter(&text, &self.patterns) {
+                let group_index = re_match.pattern_idx;
 
                 //regex returns bytes offset
                 //we want character position
-                let a = text[..re_match.start()].chars().count();
-                let b = text[..re_match.end()].chars().count();
+                let a = text[..re_match.start].chars().count();
+                let b = text[..re_match.end].chars().count();
 
                 let forms = self.re_group_index_to_ligature_forms[&group_index];
 
@@ -225,7 +219,7 @@ impl ArabicReshaper {
         result
     }
 
-    fn ligature_re(&mut self) -> Regex {
+    fn ligature_re(&mut self) {
         let mut index = 0;
         //const FORMS: i16 = 1;
         //const MATCH: i16 = 0;
@@ -238,11 +232,58 @@ impl ArabicReshaper {
 
                 self.re_group_index_to_ligature_forms
                     .insert(index, replacement.1);
-                self.patterns.push("(".to_string() + replacement.0 + ")");
+                self.patterns.push(replacement.0);
                 index += 1;
             }
         }
-
-        Regex::new(&self.patterns.join("|")).unwrap()
     }
+}
+
+fn captures_iter(s: &str, patterns: &[&str]) -> Vec<Match> {
+    let mut result = vec![];
+    for (pattern_idx, pat) in patterns.iter().enumerate() {
+        let start = match s.find(pat) {
+            Some(idx) => idx,
+            None => {
+                continue;
+            }
+        };
+
+        let end = start + pat.len();
+        result.push(Match {
+            start,
+            end,
+            pattern_idx,
+        });
+    }
+    result
+}
+
+#[test]
+fn test_captrues_iter() {
+    let test = "aaa__sqdbbbdbb";
+    let patterns = vec!["aaa", "bbb"];
+
+    assert_eq!(
+        captures_iter(test, &patterns),
+        vec!(
+            Match {
+                start: 0,
+                end: 3,
+                pattern_idx: 0
+            },
+            Match {
+                start: 8,
+                end: 11,
+                pattern_idx: 1
+            }
+        )
+    );
+}
+
+#[derive(Debug, PartialEq)]
+struct Match {
+    start: usize,
+    end: usize,
+    pattern_idx: usize,
 }

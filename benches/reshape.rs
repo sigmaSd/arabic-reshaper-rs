@@ -4,7 +4,7 @@ extern crate test;
 use arabic_reshaper::arabic_reshape;
 use test::Bencher;
 
-// last run 882ns/iter
+// last run 700ns/iter
 #[bench]
 fn bench_reshape(b: &mut Bencher) {
     // https://ar.wikipedia.org/wiki/%D8%A5%D9%84%D8%B3%D9%85%D9%88%D8%B1
