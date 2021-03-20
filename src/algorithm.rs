@@ -135,13 +135,7 @@ impl ArabicReshaper {
         if self.configuration["support_ligatures"] {
             let mut text: String = text
                 .chars()
-                .filter_map(|c| {
-                    if HARAKAT_RE.iter().any(|r| r.contains(&c)) {
-                        None
-                    } else {
-                        Some(c)
-                    }
-                })
+                .filter(|c| !HARAKAT_RE.iter().any(|r| r.contains(c)))
                 .collect();
 
             if delete_tatweel {
@@ -218,7 +212,7 @@ impl ArabicReshaper {
                 if o.1 == NOT_SUPPORTED || o.1 == UNSHAPED {
                     result.push(c);
                 } else {
-                    let unc = LETTERS[&c][o.1 as usize];
+                    let unc = LETTERS[c][o.1 as usize];
                     result.push(unc.chars().next().unwrap());
                 }
             }

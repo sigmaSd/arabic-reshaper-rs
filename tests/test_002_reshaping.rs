@@ -34,16 +34,16 @@ fn reshape_test() {
 #[test]
 fn test_zwj_reshaping() {
     let beh = 'ب';
-    let beh_isolated = LETTERS[&beh][ISOLATED as usize];
-    let beh_initial = LETTERS[&beh][INITIAL as usize];
-    let beh_medial = LETTERS[&beh][MEDIAL as usize];
-    let beh_final = LETTERS[&beh][FINAL as usize];
+    let beh_isolated = LETTERS[beh][ISOLATED as usize];
+    let beh_initial = LETTERS[beh][INITIAL as usize];
+    let beh_medial = LETTERS[beh][MEDIAL as usize];
+    let beh_final = LETTERS[beh][FINAL as usize];
 
     let alef = 'ا';
-    let alef_final = LETTERS[&alef][FINAL as usize];
+    let alef_final = LETTERS[alef][FINAL as usize];
 
     let hamza = 'ء';
-    let hamza_isolated = LETTERS[&hamza][ISOLATED as usize];
+    let hamza_isolated = LETTERS[hamza][ISOLATED as usize];
 
     let beh = beh.to_string();
     let beh_isolated = beh_isolated.to_string();
