@@ -37,6 +37,12 @@ impl<T: PartialEq, U, const N: usize> Map<T, U, N> {
     pub fn contains_key(&self, key: &T) -> bool {
         self.0.iter().any(|elem| &elem.0 == key)
     }
+    pub fn get(&self, key: &T) -> Option<&U> {
+        self.0
+            .iter()
+            .find(|elem| &elem.0 == key)
+            .map(|(_, value)| value)
+    }
 }
 
 pub static LETTERS: Map<char, [&'static str; 4], 78> = Map([
@@ -199,39 +205,30 @@ pub static LETTERS: Map<char, [&'static str; 4], 78> = Map([
 ]);
 
 pub fn connects_with_letter_before(letter: char) -> bool {
-    if !LETTERS.contains_key(&letter) {
-        return false;
-    }
-    let forms = LETTERS[letter];
-
-    if !forms[FINAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
-        return true;
+    if let Some(forms) = LETTERS.get(&letter) {
+        if !forms[FINAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
+            return true;
+        }
     }
 
     false
 }
 
 pub fn connects_with_letter_after(letter: char) -> bool {
-    if !LETTERS.contains_key(&letter) {
-        return false;
-    }
-    let forms = LETTERS[letter];
-
-    if !forms[INITIAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
-        return true;
+    if let Some(forms) = LETTERS.get(&letter) {
+        if !forms[INITIAL as usize].is_empty() || !forms[MEDIAL as usize].is_empty() {
+            return true;
+        }
     }
 
     false
 }
 
 pub fn connects_with_letters_before_and_after(letter: char) -> bool {
-    if !LETTERS.contains_key(&letter) {
-        return false;
-    }
-    let forms = LETTERS[letter];
-
-    if !forms[MEDIAL as usize].is_empty() {
-        return true;
+    if let Some(forms) = LETTERS.get(&letter) {
+        if !forms[MEDIAL as usize].is_empty() {
+            return true;
+        }
     }
 
     false
