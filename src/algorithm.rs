@@ -33,7 +33,7 @@ impl From<char> for CharType {
 }
 
 pub struct ArabicReshaper<'a> {
-    pub configuration: HashMap<String, bool>,
+    pub configuration: HashMap<&'static str, bool>,
     re_group_index_to_ligature_forms: HashMap<usize, [&'static str; 4]>,
     patterns: Vec<&'a str>,
 }

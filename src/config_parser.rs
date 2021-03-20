@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
-pub fn parse() -> HashMap<String, bool> {
-    let mut config_map = HashMap::new();
-    let config_file = include_str!("default-config.ini");
+static CONFIG_FILE: &str = include_str!("default-config.ini");
 
-    let mut parse = |line: &str| -> Option<()> {
+pub fn parse() -> HashMap<&'static str, bool> {
+    let mut config_map = HashMap::new();
+
+    let mut parse = |line: &'static str| -> Option<()> {
         if !line.contains('=') || line.starts_with('#') {
             return None;
         }
@@ -17,11 +18,11 @@ pub fn parse() -> HashMap<String, bool> {
             _ => return None,
         };
 
-        config_map.insert(option.to_string(), value);
+        config_map.insert(option, value);
         None
     };
 
-    for line in config_file.lines() {
+    for line in CONFIG_FILE.lines() {
         parse(line);
     }
 
