@@ -21,6 +21,9 @@ println!("{}",arabic_reshape(salam));
 
 Checkout the tests directory for more examples.
 
+## Minimum Rust version
+Starting version `0.4.0` the msrv is  **1.51**
+
 ### CLI:
 
 [`rtl_reshaper_rs`](https://github.com/NightMachinary/rtl_reshaper_rs) is a CLI frontend available that reshapes and reorders `stdin`.
