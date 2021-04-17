@@ -1,3 +1,6 @@
+**0.4.1**
+- Move tests to src. It allows making `letters` module private instead of relying on `#[doc(Hidden)]`
+
 **0.4.0**
 - Bump msrv to 1.51 (for const generics)
 - Performance improvements
