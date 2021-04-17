@@ -21,12 +21,13 @@
 //!
 //! [python-arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper)
 
-mod config_parser;
-#[doc(hidden)]
-pub mod letters;
-mod ligatures;
-
 mod algorithm;
+mod config_parser;
+mod letters;
+mod ligatures;
+#[cfg(test)]
+mod tests;
+
 pub use algorithm::ArabicReshaper;
 
 pub fn arabic_reshape(text: &str) -> String {

@@ -1,7 +1,7 @@
-use arabic_reshaper::arabic_reshape;
-use arabic_reshaper::letters::LETTERS;
-use arabic_reshaper::letters::{FINAL, INITIAL, ISOLATED, MEDIAL, ZWJ};
-use arabic_reshaper::ArabicReshaper;
+use crate::arabic_reshape;
+use crate::letters::LETTERS;
+use crate::letters::{FINAL, INITIAL, ISOLATED, MEDIAL, ZWJ};
+use crate::ArabicReshaper;
 
 #[test]
 fn reshape_test() {

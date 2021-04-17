@@ -1,4 +1,4 @@
-use arabic_reshaper::arabic_reshape;
+use crate::arabic_reshape;
 #[test]
 fn test_default_reshaping() {
     let cases = [
