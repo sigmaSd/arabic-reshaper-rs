@@ -4,6 +4,7 @@
 **0.4.0**
 - Bump msrv to 1.51 (for const generics)
 - Performance improvements
+- Removed all dependencies
 
 **0.3.1**
 - Remove unneeded character number limitation
