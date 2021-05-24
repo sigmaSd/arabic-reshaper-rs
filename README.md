@@ -16,7 +16,9 @@ Reshape letters
 use arabic_reshaper::arabic_reshape;
 let salam = "سلام";
 println!("{}",arabic_reshape(salam));
-// سلام correctly rendred.
+//  سلام is now correctly reshaped but the letters are not reversed yet
+// For simple cases we can  use chars().rev()
+// For a more correct approach http://unicode.org/reports/tr9/ should be used (via https://docs.rs/unic_bidi crate for example)
 ```
 
 Checkout the tests directory for more examples.
