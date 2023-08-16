@@ -1,7 +1,7 @@
 #![feature(test)]
 extern crate test;
 
-use arabic_reshaper::arabic_reshape;
+use arabic_reshaper::ArabicReshaper;
 use test::Bencher;
 
 // last run 614ns/iter
@@ -12,5 +12,6 @@ fn bench_reshape(b: &mut Bencher) {
 
 بلغ متوسط دخل الأسرة في القرية 43,000 دولار، أما متوسط دخل العائلة فبلغ 50,625 دولار. وكان متوسط دخل الذكور 30,750 دولار مقابل 15,833 دولار للإناث. وسجل دخل الفرد الخاص بالقرية 22,813 دولار.
 ";
-    b.iter(|| arabic_reshape(text));
+    let reshaper = ArabicReshaper::new();
+    b.iter(|| reshaper.reshape(text));
 }

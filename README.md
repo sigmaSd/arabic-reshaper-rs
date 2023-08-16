@@ -19,7 +19,7 @@ println!("{}",arabic_reshape(salam));
 // سلام correctly rendred.
 ```
 
-Checkout the tests directory for more examples.
+Checkout the tests/bench directories for more examples.
 
 ## Minimum Rust version
 Starting version `0.4.0` the msrv is  **1.51**
