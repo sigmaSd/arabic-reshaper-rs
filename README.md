@@ -21,7 +21,7 @@ println!("{}",arabic_reshape(salam));
 // For a more correct approach http://unicode.org/reports/tr9/ should be used (via https://docs.rs/unic_bidi crate for example)
 ```
 
-Checkout the tests directory for more examples.
+Checkout the tests/bench directories for more examples.
 
 ## Minimum Rust version
 Starting version `0.4.0` the msrv is  **1.51**

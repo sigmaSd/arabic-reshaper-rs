@@ -46,15 +46,27 @@ impl Default for ArabicReshaper<'_> {
 
 impl ArabicReshaper<'_> {
     pub fn new() -> Self {
+        let configuration = parse();
+        let mut re_group_index_to_ligature_forms = HashMap::new();
+        let mut patterns = Vec::new();
+
+        if configuration["support_ligatures"] {
+            Self::ligature_re(
+                &configuration,
+                &mut re_group_index_to_ligature_forms,
+                &mut patterns,
+            );
+        }
+
         Self {
-            configuration: parse(),
-            re_group_index_to_ligature_forms: HashMap::new(),
-            patterns: Vec::new(),
+            configuration,
+            re_group_index_to_ligature_forms,
+            patterns,
         }
     }
 
     #[allow(clippy::cognitive_complexity)]
-    pub fn reshape(&mut self, text: &str) -> String {
+    pub fn reshape(&self, text: &str) -> String {
         let mut output = Vec::new();
 
         let delete_harakat = self.configuration["delete_harakat"];
@@ -140,9 +152,6 @@ impl ArabicReshaper<'_> {
                 text = text.replace(TATWEEL, "");
             }
 
-            // fill patterns
-            self.ligature_re();
-
             // find patter matches in text
             for re_match in captures_iter(&text, &self.patterns) {
                 let group_index = re_match.pattern_idx;
@@ -219,20 +228,23 @@ impl ArabicReshaper<'_> {
         result
     }
 
-    fn ligature_re(&mut self) {
+    fn ligature_re(
+        configuration: &HashMap<&str, bool>,
+        re_group_index_to_ligature_forms: &mut HashMap<usize, [&'static str; 4]>,
+        patterns: &mut Vec<&str>,
+    ) {
         let mut index = 0;
         //const FORMS: i16 = 1;
         //const MATCH: i16 = 0;
-        if self.re_group_index_to_ligature_forms.is_empty() {
+        if re_group_index_to_ligature_forms.is_empty() {
             for ligature_record in LIGATURES.iter() {
                 let (ligature, replacement) = ligature_record;
-                if !self.configuration[*ligature] {
+                if !configuration[*ligature] {
                     continue;
                 }
 
-                self.re_group_index_to_ligature_forms
-                    .insert(index, replacement.1);
-                self.patterns.push(replacement.0);
+                re_group_index_to_ligature_forms.insert(index, replacement.1);
+                patterns.push(replacement.0);
                 index += 1;
             }
         }

@@ -31,7 +31,7 @@ mod tests;
 pub use algorithm::ArabicReshaper;
 
 pub fn arabic_reshape(text: &str) -> String {
-    let mut ar = ArabicReshaper::new();
+    let ar = ArabicReshaper::new();
 
     ar.reshape(text)
 }
